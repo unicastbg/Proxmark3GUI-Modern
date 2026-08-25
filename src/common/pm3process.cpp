@@ -21,6 +21,10 @@ void PM3Process::connectPM3(const QString& path, const QStringList args)
 {
     QString result;
     Util::ClientType clientType;
+
+    if(state() != QProcess::NotRunning)
+        killPM3();
+
     setRequiringOutput(true);
 	QRegularExpression osPattern("(os:\\s+|OS\\.+\\s+)");
 
@@ -127,10 +131,17 @@ void PM3Process::onTimeout() //when the proxmark3 client is unexpectedly termina
 //    isBusy() will always return false on Raspbian, in this case, check "Keep the client active" in the Settings panel.
 //
 //    qDebug()<<portInfo->isBusy();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     if(!portInfo->isBusy())
     {
         killPM3();
     }
+#else
+    if(state() == QProcess::NotRunning)
+    {
+        emit PM3StatedChanged(false);
+    }
+#endif
 }
 
 void PM3Process::testThread()
@@ -171,7 +182,19 @@ void PM3Process::setWorkingDir(const QString& dir)
 
 void PM3Process::killPM3()
 {
-    kill();
-    emit PM3StatedChanged(false);
+    setRequiringOutput(false);
     setSerialListener(false);
+
+    if(state() != QProcess::NotRunning)
+    {
+        terminate();
+        if(!waitForFinished(1500))
+        {
+            kill();
+            waitForFinished(3000);
+        }
+    }
+
+    close();
+    emit PM3StatedChanged(false);
 }

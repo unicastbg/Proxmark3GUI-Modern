@@ -1,100 +1,116 @@
-# Proxmark3GUI
-[![downloads](https://img.shields.io/github/downloads/wh201906/Proxmark3GUI/total?label=GitHub%20release%20downloads)](https://github.com/wh201906/Proxmark3GUI/releases)  
-[![downloads](https://img.shields.io/sourceforge/dt/proxmark3gui.svg?label=SourceForge%20downloads)](https://sourceforge.net/projects/proxmark3gui/)  
+# Proxmark3GUI Modern
 
-A cross-platform GUI for [Proxmark3](https://github.com/Proxmark/proxmark3)/[Proxmark3 Iceman fork](https://github.com/RfidResearchGroup/proxmark3) client  
+Modern Windows-focused GUI for the Proxmark3 RRG/Iceman client.
 
-(The [orignal Proxmark3 repo](https://github.com/Proxmark/proxmark3) has been unmaintained for a long time. I personally suggest using the [Proxmark3 Iceman fork](https://github.com/RfidResearchGroup/proxmark3))
+Project home: [github.com/unicastbg/Proxmark3GUI-Modern](https://github.com/unicastbg/Proxmark3GUI-Modern)
 
-[中文介绍](doc/README/README_zh_CN.md)
+This project is a modernization fork of
+[wh201906/Proxmark3GUI](https://github.com/wh201906/Proxmark3GUI). It keeps the
+advanced Proxmark workflows while adding a simpler daily-use interface for
+connecting, scanning, cloning supported personal tags, and verifying the result.
 
-***
+Use this software only with cards, tags, readers, and systems you own or are
+explicitly authorized to test.
 
-## Features
+## Screenshots
 
-+ Easy to find available Serial Port
-+ Support raw commands of Proxmark3 client(Official/Iceman)
-+ Have a friendly UI to test Mifare cards
-    + Support different card size(MINI, 1K, 2K, 4K)
-    + Easy to edit Mifare block data
-    + Easy to read all/selected blocks with well-designed read logic
-    + Easy to write all/selected blocks
-    + Support binary(.bin .dump) files and text(.eml) files
-    + Analyze Access Bits
-    + Support Chinese Magic Card
-+ Have basic support for LF commands
-+ Customize UI  
-+ ...  
+Simple scan and clone workflow:
 
-***
+![Simple scan workflow](doc/screenshots/simple-page.png)
 
-## Preview
-![preview](doc/README/preview.png)  
+Guided dump and restore workflow:
 
-[more previews](doc/preview/previews.md)  
+![Guided dump workflow](doc/screenshots/guided-dump.png)
 
-***
+## Current Focus
 
-## About Compiled Windows clients
+- Windows desktop app built with Qt 6 and MinGW.
+- RRG/Iceman Proxmark3 client compatibility.
+- Simple page for connection, scan, UID/ID clone, and verification.
+- Guided Dump page for MIFARE Classic dump, restore, verify, and visual card map.
+- Automatic COM port discovery, including later USB plug-ins.
+- Automatic nearby `proxmark3.exe` discovery when possible.
+- Clear Proxmark3 LF/HF placement visual.
+- Settings cleanup for generated `hf-mf-*` dump/key files.
+- Installer support through NSIS.
 
-A cool guy [Gator96100](https://github.com/Gator96100) creates [ProxSpace](https://github.com/Gator96100/ProxSpace) and makes it possible to compile both the firmware and the client on Windows.  
-Also, he makes the [pre-compiled Windows client](https://www.proxmarkbuilds.org/) so you can download it and run your PM3 client on Windows instantly.  
-I included his compiled client in my releases so you can use the GUI on the fly, and you can also use the GUI with your prefered client.  
-Great thanks to him.  
+## What It Can Do Today
 
-***
+- Identify common LF/HF cards through the Proxmark client.
+- Clone simple LF EM410x IDs to compatible T5577-style tags.
+- Clone visible HF/MIFARE UIDs to compatible magic UID/CUID/USCUID-style cards.
+- Dump and restore MIFARE Classic cards when keys are known or discoverable.
+- Show a visual MIFARE Classic sector/block map after dump and verify.
+- Compare source and target card data where the Proxmark client exposes it.
 
-## Download binaries for Windows 
-You can download pre-built Windows binaries in [release](https://github.com/wh201906/Proxmark3GUI/releases) page  
-`Vx.x.x-win64.7z` only contains the GUI  
-`Vx.x.x-win64-xxxxxxx.7z` contains the GUI and corresponding client. You just need to open `Vx.x.x-win64-xxxxxxx\GUI\Proxmark3GUI.exe`  
+Full card duplication depends on card family, access keys, locked blocks, target
+card type, and reader behavior. The GUI reports failures such as mismatched UID
+block 0 or unreadable sectors instead of treating every clone as identical.
 
-You can also download them in SourceForge  
-[![Download Proxmark3GUI](https://a.fsdn.com/con/app/sf-download-button)](https://sourceforge.net/projects/proxmark3gui/files/latest/download)  
+## Requirements
 
-## Build on Linux
-```
-cd ~
-sudo apt-get update
-sudo apt-get install git build-essential
-sudo apt-get install qt5-default libqt5serialport5-dev
-git clone https://github.com/wh201906/Proxmark3GUI.git --depth=1
-cd Proxmark3GUI
-mkdir build && cd build
-qmake ../src
-make -j4 && make clean
-./Proxmark3GUI
-```
+- Windows 10/11.
+- A Proxmark3-compatible device.
+- A matching RRG/Iceman `proxmark3.exe` client.
+- Qt 6.11.x and MinGW if building from source.
+- NSIS if building the installer.
 
-## Build on macOS
-```
-cd ~
-brew update
-brew install qt@5
-brew link qt5 --force
-git clone https://github.com/wh201906/Proxmark3GUI.git --depth=1
-cd Proxmark3GUI
-mkdir build && cd build
-qmake ../src
-make -j4 && make clean
-open Proxmark3GUI.app
+The app does not currently bundle a Proxmark client in the installer. Put a
+known-good RRG/Iceman client near the app or select it in Settings.
+
+## Build From Source
+
+Example local build used during development:
+
+```powershell
+$env:PATH='C:\Qt\6.11.2\mingw_64\bin;C:\Qt\Tools\mingw1310_64\bin;' + $env:PATH
+mkdir build-modern
+cd build-modern
+qmake ..\src\Proxmark3GUI.pro
+mingw32-make -j4
+windeployqt .\release\Proxmark3GUI.exe
 ```
 
-> In order for the GUI to connect to the device in macOS, you'd need to tweak the settings a little bit
+The built app will be at:
 
-Client Path must be path to pm3 console client like "/usr/local/bin/pm3/"
+```text
+build-modern\release\Proxmark3GUI.exe
+```
 
-![macOS_settings](doc/README/macOS_settings.png)
+## Build Installer
 
-***
+Install NSIS, then run:
 
-## Tutorial
+```powershell
+.\installer\nsis\Build-Installer.ps1
+```
 
-[1.Quickstart](doc/tutorial/Quickstart/quickstart.md)  
-[2.Work with ProxSpace](doc/tutorial/Work_With_ProxSpace/work_with_proxspace.md)  
-[3.Edit Mifare Classic data](doc/tutorial/Edit_Mifare_Classic_data/Edit_Mifare_Classic_data.md)(Proxmark3 hardware is not necessary)  
+The script builds the Qt release, stages only runtime files, and creates:
 
-***
+```text
+dist\Proxmark3GUI-Modern-0.3.0-setup.exe
+```
 
-## Change Log
-[Change Log](CHANGELOG.md)
+## GitHub Release Checklist
+
+Before publishing a release:
+
+- Build `Proxmark3GUI.exe`.
+- Run `windeployqt`.
+- Run the NSIS installer build.
+- Test install, launch, connect, scan, clone, dump, and verify.
+- Confirm README and release notes mention that users need an RRG/Iceman client.
+- Keep upstream attribution and the LGPL-2.1 license.
+- Replace screenshots with sanitized release captures if needed.
+
+## Credits
+
+This project is based on the original
+[Proxmark3GUI by wh201906](https://github.com/wh201906/Proxmark3GUI).
+
+It is designed for use with the
+[RRG/Iceman Proxmark3 client](https://github.com/RfidResearchGroup/proxmark3).
+
+## License
+
+LGPL-2.1, matching the bundled upstream license.

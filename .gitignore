@@ -1,2 +1,7 @@
 /build*
+/dist
 /data
+/.qmake.stash
+/GUIsettings.ini
+*.user
+installer/nsis/*.exe

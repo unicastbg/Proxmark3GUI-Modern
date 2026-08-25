@@ -1,0 +1,241 @@
+QWidget {
+    background: #101418;
+    color: #e7edf2;
+    font-family: "Segoe UI", "Inter", "Arial";
+    font-size: 10pt;
+    selection-background-color: #2f80ed;
+    selection-color: #ffffff;
+}
+
+QMainWindow,
+QDialog {
+    background: #101418;
+}
+
+QMenuBar,
+QMenu,
+QStatusBar {
+    background: #151b21;
+    color: #d9e2ea;
+    border: 0;
+}
+
+QStatusBar {
+    border-top: 1px solid #26313b;
+}
+
+QStatusBar QLabel {
+    background: transparent;
+    color: #aebbc7;
+    padding: 3px 8px;
+}
+
+QDockWidget {
+    titlebar-close-icon: none;
+    titlebar-normal-icon: none;
+    border: 1px solid #26313b;
+}
+
+QDockWidget::title {
+    background: #151b21;
+    color: #d9e2ea;
+    padding: 8px 10px;
+    border-bottom: 1px solid #26313b;
+}
+
+QToolBar {
+    background: #151b21;
+    border: 0;
+    border-bottom: 1px solid #26313b;
+    spacing: 6px;
+    padding: 8px;
+}
+
+QToolBar QToolButton {
+    background: #1b252e;
+    color: #d9e2ea;
+    border: 1px solid #2a3540;
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-weight: 600;
+}
+
+QToolBar QToolButton:hover {
+    background: #24313d;
+    border-color: #46a6ff;
+}
+
+QGroupBox {
+    background: #151b21;
+    border: 1px solid #26313b;
+    border-radius: 8px;
+    margin-top: 18px;
+    padding: 12px 10px 10px 10px;
+    font-weight: 600;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 10px;
+    padding: 0 6px;
+    color: #e7edf2;
+    background: #151b21;
+}
+
+QPushButton {
+    background: #2383e2;
+    color: #ffffff;
+    border: 1px solid #3291ef;
+    border-radius: 6px;
+    padding: 7px 12px;
+    min-height: 20px;
+    font-weight: 600;
+}
+
+QPushButton:hover {
+    background: #3291ef;
+}
+
+QPushButton:pressed {
+    background: #1f6feb;
+}
+
+QPushButton:disabled {
+    background: #26313b;
+    border-color: #303b46;
+    color: #71808d;
+}
+
+QLineEdit,
+QComboBox,
+QSpinBox,
+QDoubleSpinBox,
+QTextEdit,
+QPlainTextEdit {
+    background: #0c1014;
+    color: #e7edf2;
+    border: 1px solid #2a3540;
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+
+QLineEdit:focus,
+QComboBox:focus,
+QSpinBox:focus,
+QDoubleSpinBox:focus,
+QTextEdit:focus,
+QPlainTextEdit:focus {
+    border-color: #46a6ff;
+}
+
+QComboBox::drop-down {
+    border: 0;
+    width: 26px;
+}
+
+QTableWidget,
+QTableView,
+QListWidget,
+QTreeWidget {
+    background: #0c1014;
+    alternate-background-color: #111820;
+    color: #e7edf2;
+    border: 1px solid #26313b;
+    border-radius: 6px;
+    gridline-color: #26313b;
+}
+
+QHeaderView::section {
+    background: #18212a;
+    color: #b9c6d3;
+    border: 0;
+    border-right: 1px solid #26313b;
+    border-bottom: 1px solid #26313b;
+    padding: 7px;
+    font-weight: 600;
+}
+
+QTabBar::tab {
+    background: #151b21;
+    color: #aebbc7;
+    border: 1px solid #26313b;
+    border-bottom: 0;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    padding: 8px 14px;
+    margin-right: 2px;
+}
+
+QTabBar::tab:selected {
+    background: #202a33;
+    color: #ffffff;
+}
+
+QCheckBox,
+QRadioButton {
+    spacing: 8px;
+    padding: 4px;
+}
+
+QScrollBar:vertical {
+    background: #101418;
+    width: 12px;
+    margin: 0;
+}
+
+QScrollBar::handle:vertical {
+    background: #3a4652;
+    border-radius: 6px;
+    min-height: 24px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #52606d;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+#simpleScanPanel {
+    background: transparent;
+}
+
+#simpleReaderMap {
+    background: #0e1318;
+    border: 2px solid #33404b;
+    border-radius: 8px;
+}
+
+#simpleLfPad,
+#simpleHfPad {
+    background: #121922;
+    border: 2px dashed #354452;
+    border-radius: 8px;
+}
+
+#simpleLfPad QLabel,
+#simpleHfPad QLabel,
+#simpleReaderMap QLabel {
+    background: transparent;
+}
+
+#simpleHfPad QLabel {
+    color: #9ccfff;
+}
+
+#simpleLfPad QLabel {
+    color: #a8efbc;
+}
+
+#simpleConnectionLabel {
+    color: #aebbc7;
+    font-weight: 600;
+    padding: 0 6px;
+}
+
+#simpleDetailsEdit {
+    font-family: "Consolas", "Cascadia Mono", monospace;
+}

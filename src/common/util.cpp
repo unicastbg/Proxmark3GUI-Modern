@@ -29,9 +29,21 @@ void Util::processOutput(const QString& output)
 
 void Util::execCMD(const QString& cmd)
 {
-    qDebug() << "executing: " << cmd;
-    if(isRunning)
-        emit write(cmd + "\n");
+    QString cleanCmd = cmd.trimmed();
+    qDebug() << "executing: " << cleanCmd;
+    if(cleanCmd.isEmpty())
+    {
+        emit refreshOutput("\n[GUI] No command is configured for this action.\n");
+        return;
+    }
+    if(!isRunning)
+    {
+        emit refreshOutput("\n[GUI] Connect to the Proxmark3 first.\n");
+        return;
+    }
+
+    emit refreshOutput("\n[GUI] > " + cleanCmd + "\n");
+    emit write(cleanCmd + "\n");
 }
 
 QString Util::execCMDWithOutput(const QString& cmd, ReturnTrigger trigger, bool rawOutput)
@@ -114,7 +126,9 @@ bool Util::chooseLanguage(QSettings* guiSettings, QMainWindow* window)
     // make sure the GUISettings is not in any group
     QSettings* langSettings = new QSettings(":/i18n/languages.ini", QSettings::IniFormat);
     QMap<QString, QString> langMap;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     langSettings->setIniCodec("UTF-8");
+#endif
     langSettings->beginGroup("Languages");
     QStringList langList = langSettings->allKeys();
     for(int i = 0; i < langList.size(); i++)
@@ -147,9 +161,36 @@ bool Util::chooseLanguage(QSettings* guiSettings, QMainWindow* window)
 
 void Util::gotoRawTab()
 {
-    Util::ui->funcTab->setCurrentIndex(Util::rawTabIndex);
-    Util::rawDockPtr->setVisible(true);
-    Util::rawDockPtr->raise();
+    QWidget* rawTab = Util::ui->rawTab;
+    if(Util::rawDockPtr != nullptr)
+    {
+        Util::ui->funcTab->setCurrentIndex(Util::rawTabIndex);
+        Util::rawDockPtr->setVisible(true);
+        Util::rawDockPtr->raise();
+        return;
+    }
+
+    for(int i = 0; i < Util::ui->funcTab->count(); i++)
+    {
+        QWidget* page = Util::ui->funcTab->widget(i);
+        if(page == rawTab)
+        {
+            Util::ui->funcTab->setCurrentIndex(i);
+            return;
+        }
+
+        QTabWidget* nestedTabs = page->findChild<QTabWidget*>();
+        if(nestedTabs == nullptr)
+            continue;
+
+        int rawIndex = nestedTabs->indexOf(rawTab);
+        if(rawIndex >= 0)
+        {
+            Util::ui->funcTab->setCurrentIndex(i);
+            nestedTabs->setCurrentIndex(rawIndex);
+            return;
+        }
+    }
 }
 
 void Util::setUI(Ui::MainWindow *ui)

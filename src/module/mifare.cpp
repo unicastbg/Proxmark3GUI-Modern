@@ -481,10 +481,29 @@ void Mifare::readSelected(TargetType targetType)
     QString trailerA, trailerB;
     QList<bool> selectedSectors;
     QList<int> selectedBlocks;
+    int readBlocks = 0;
     for(int i = 0; i < cardType.block_size; i++)
     {
         if(ui->MF_dataWidget->item(i, 1)->checkState() == Qt::Checked)
             selectedBlocks.append(i);
+    }
+
+    if(selectedBlocks.isEmpty())
+    {
+        QMessageBox::information(parent, tr("Info"), tr("No blocks are selected."));
+        return;
+    }
+
+    if(selectedBlocks.size() > 16)
+    {
+        QMessageBox::StandardButton res = QMessageBox::question(parent,
+                                         tr("Read Selected"),
+                                         tr("%1 blocks are selected. This can take a long time, especially if the card is not MIFARE Classic or not a Gen1 magic card.\n\nContinue?")
+                                         .arg(selectedBlocks.size()),
+                                         QMessageBox::Yes | QMessageBox::No,
+                                         QMessageBox::No);
+        if(res != QMessageBox::Yes)
+            return;
     }
 
     for(int i = 0; i < cardType.sector_size; i++)
@@ -557,6 +576,8 @@ void Mifare::readSelected(TargetType targetType)
             {
                 dataList->replace(cardType.blks[i] + j, data[j]);
                 data_syncWithDataWidget(false, cardType.blks[i] + j);
+                if(!data[j].isEmpty())
+                    readBlocks++;
             }
         }
 
@@ -575,6 +596,9 @@ void Mifare::readSelected(TargetType targetType)
             data_syncWithKeyWidget(false, i, KEY_B);
         }
     }
+
+    if(readBlocks == 0)
+        QMessageBox::information(parent, tr("Info"), tr("No selected blocks were read. Check the Raw tab for command output and verify the card type, keys, and target mode."));
 }
 
 bool Mifare::_writeblk(int blockId, KeyType keyType, const QString& key, const QString& data, TargetType targetType, int waitTime)
@@ -865,11 +889,11 @@ void Mifare::data_syncWithDataWidget(bool syncAll, int block)
             tmp = "";
             if(dataList->at(i) != "")
             {
-                tmp += dataList->at(i).midRef(0, 2);
+                tmp += dataList->at(i).mid(0, 2);
                 for(int j = 1; j < 16; j++)
                 {
                     tmp += " ";
-                    tmp += dataList->at(i).midRef(j * 2, 2);
+                    tmp += dataList->at(i).mid(j * 2, 2);
                 }
             }
             ui->MF_dataWidget->item(i, 2)->setText(tmp);
@@ -880,11 +904,11 @@ void Mifare::data_syncWithDataWidget(bool syncAll, int block)
         tmp = "";
         if(dataList->at(block) != "")
         {
-            tmp += dataList->at(block).midRef(0, 2);
+            tmp += dataList->at(block).mid(0, 2);
             for(int j = 1; j < 16; j++)
             {
                 tmp += " ";
-                tmp += dataList->at(block).midRef(j * 2, 2);
+                tmp += dataList->at(block).mid(j * 2, 2);
             }
         }
         ui->MF_dataWidget->item(block, 2)->setText(tmp);
@@ -1159,7 +1183,7 @@ bool Mifare::data_saveDataFile(const QString& filename, bool isBin)
         {
             for(int i = 0; i < cardType.block_size; i++)
             {
-                buff += dataList->at(i);
+                buff += dataList->at(i).toLatin1();
                 buff += "\n";
             }
         }
@@ -1238,7 +1262,7 @@ void Mifare::data_key2Data()
         if(dataList->at(getTrailerBlockId(i)) == "")
             tmp += "FF078069"; // default control bytes
         else
-            tmp += dataList->at(getTrailerBlockId(i)).midRef(12, 8);
+            tmp += dataList->at(getTrailerBlockId(i)).mid(12, 8);
 
         if(data_isKeyValid(keyBList->at(i)))
             tmp += keyBList->at(i);

@@ -134,8 +134,8 @@ private:
     QRegularExpression* keyPattern;
     QString bin2text(const QByteArray& buff, int start, int length);
 
-    QString _readblk(int blockId, KeyType keyType, const QString& key, TargetType targetType = TARGET_MIFARE, int waitTime = 300);
-    QStringList _readsec(int sectorId, KeyType keyType, const QString& key, TargetType targetType = TARGET_MIFARE, int waitTime = 300);
+    QString _readblk(int blockId, KeyType keyType, const QString& key, TargetType targetType = TARGET_MIFARE, int waitTime = 1000);
+    QStringList _readsec(int sectorId, KeyType keyType, const QString& key, TargetType targetType = TARGET_MIFARE, int waitTime = 1000);
     bool _writeblk(int blockId, KeyType keyType, const QString& key, const QString& data, TargetType targetType = TARGET_MIFARE, int waitTime = 300);
 };
 

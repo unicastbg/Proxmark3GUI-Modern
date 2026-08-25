@@ -14,7 +14,11 @@ MF_trailerDecoderDialog::MF_trailerDecoderDialog(QWidget *parent) :
     sizeGroup = new QButtonGroup(this);
     sizeGroup->addButton(ui->size4Button, 4);
     sizeGroup->addButton(ui->size16Button, 16);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     connect(sizeGroup, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, &MF_trailerDecoderDialog::on_blockSizeChanged);
+#else
+    connect(sizeGroup, &QButtonGroup::idToggled, this, &MF_trailerDecoderDialog::on_blockSizeChanged);
+#endif
     connect(ui->C0Box, QOverload<int>::of(&QSpinBox::valueChanged), this, &MF_trailerDecoderDialog::on_boxChanged);
     connect(ui->C1Box, QOverload<int>::of(&QSpinBox::valueChanged), this, &MF_trailerDecoderDialog::on_boxChanged);
     connect(ui->C2Box, QOverload<int>::of(&QSpinBox::valueChanged), this, &MF_trailerDecoderDialog::on_boxChanged);

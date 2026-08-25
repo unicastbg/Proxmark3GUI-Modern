@@ -1,10 +1,11 @@
 ﻿#include "ui/mainwindow.h"
 
 #include <QApplication>
+#include <QIcon>
 #include <QSettings>
-#include <QTranslator>
-#include <QMessageBox>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QTextCodec>
+#endif
 #include <QDir>
 
 int main(int argc, char *argv[])
@@ -20,51 +21,33 @@ int main(int argc, char *argv[])
     }
     delete pluginDir;
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+#endif
     QApplication a(argc, argv);
+    a.setWindowIcon(QIcon(":/modern/app_icon.ico"));
 
-    QSettings* settings = new QSettings("GUIsettings.ini", QSettings::IniFormat);
-    settings->setIniCodec("UTF-8");
-    settings->beginGroup("language");
-    QString languageFile = settings->value("extPath").toString();
-    QString languageName = settings->value("name").toString();
-    settings->endGroup();
-    settings->beginGroup("UI");
-    QString theme = settings->value("Theme_Name").toString();
-    settings->endGroup();
-    if(languageName == "")
-    {
-        if(Util::chooseLanguage(settings))
-        {
-            settings->beginGroup("language");
-            languageName = settings->value("name").toString();
-            settings->endGroup();
-        }
-        else
-            languageName = "en_US";
-    }
-    if(languageName == "(ext)")
-    {
-        settings->beginGroup("language");
-        languageFile = settings->value("extPath").toString();
-        settings->endGroup();
-    }
-    else
-        languageFile = ":/i18n/" + languageName + ".qm";
-
-    // Note that the translator must be created before the application's widgets.
-    QTranslator* translator = new QTranslator();
-    if(translator->load(languageFile))
-        a.installTranslator(translator);
-    else
-        QMessageBox::information(nullptr, "Error", "Can't load " + languageFile + " as translation file.");
+    QSettings settings("GUIsettings.ini", QSettings::IniFormat);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    settings.setIniCodec("UTF-8");
+#endif
+    settings.beginGroup("UI");
+    QString theme = settings.value("Theme_Name", "modern_dark").toString();
+    settings.endGroup();
 
     QFile* themeFile = new QFile();
     QTextStream* themeStream = new QTextStream();
     QString qssString = a.styleSheet(); // default behavior
     if(theme == "(none)")
         ;
+    else if(theme == "modern_dark")
+    {
+        themeFile->setFileName(":/modern/modern_dark.qss");
+        themeFile->open(QFile::ReadOnly | QFile::Text);
+        themeStream->setDevice(themeFile);
+        qssString = themeStream->readAll();
+    }
     else if(theme == "qdss_dark")
     {
         themeFile->setFileName(":/qdarkstyle/dark/darkstyle.qss");
@@ -84,9 +67,6 @@ int main(int argc, char *argv[])
     delete themeStream;
     themeFile = nullptr;
     themeStream = nullptr;
-
-    delete settings;
-    settings = nullptr;
 
     MainWindow w;
     w.initUI();

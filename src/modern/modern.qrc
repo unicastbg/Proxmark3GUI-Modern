@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/modern">
+        <file>modern_dark.qss</file>
+        <file>app_icon.ico</file>
+    </qresource>
+</RCC>

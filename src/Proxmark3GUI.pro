@@ -51,7 +51,6 @@ FORMS += \
     ui/mf_attack_hardnesteddialog.ui
 
 TRANSLATIONS += \
-    ../i18n/zh_CN.ts \
     ../i18n/en_US.ts
 
 # Default rules for deployment.
@@ -59,13 +58,15 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-VERSION = 0.2.8
-QMAKE_TARGET_PRODUCT = "Proxmark3GUI"
-QMAKE_TARGET_DESCRIPTION = "A cross-platform GUI for Proxmark3 client"
-QMAKE_TARGET_COMPANY = "wh201906"
+VERSION = 0.3.0
+QMAKE_TARGET_PRODUCT = "Proxmark3GUI Modern"
+QMAKE_TARGET_DESCRIPTION = "Modern Windows GUI for Proxmark3 RRG/Iceman client"
+QMAKE_TARGET_COMPANY = "Proxmark3GUI Modern contributors"
+RC_ICONS = modern/app_icon.ico
 
 RESOURCES += \
     ../i18n/language.qrc \
     ../config/config.qrc \
+    modern/modern.qrc \
     qdarkstyle/dark/darkstyle.qrc \
     qdarkstyle/light/lightstyle.qrc

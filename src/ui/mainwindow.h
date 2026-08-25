@@ -26,6 +26,12 @@
 #include <QDateTime>
 #include <QDockWidget>
 #include <QMenu>
+#include <QComboBox>
+#include <QFrame>
+#include <QLabel>
+#include <QMap>
+#include <QPlainTextEdit>
+#include <QTableWidget>
 
 #include "common/myeventfilter.h"
 #include "common/pm3process.h"
@@ -251,6 +257,52 @@ private:
     QStringList portList;
     QStringList clientEnv;
     QDir* clientWorkingDir;
+    QWidget* simpleTab = nullptr;
+    QComboBox* simplePortBox = nullptr;
+    QComboBox* simpleScanModeBox = nullptr;
+    QPushButton* simpleConnectButton = nullptr;
+    QPushButton* simpleDisconnectButton = nullptr;
+    QPushButton* simpleScanButton = nullptr;
+    QPushButton* simpleCloneButton = nullptr;
+    QPushButton* simpleDetailsButton = nullptr;
+    QLabel* simpleConnectionLabel = nullptr;
+    QLabel* simpleFirmwareLabel = nullptr;
+    QLabel* simpleFrequencyLabel = nullptr;
+    QLabel* simpleTypeLabel = nullptr;
+    QLabel* simpleWritableLabel = nullptr;
+    QLabel* simpleIdLabel = nullptr;
+    QLabel* simpleResultLabel = nullptr;
+    QPlainTextEdit* simpleDetailsEdit = nullptr;
+    QWidget* simpleBoardWidget = nullptr;
+    QFrame* simpleLfPad = nullptr;
+    QFrame* simpleHfPad = nullptr;
+    QString simpleLastScanOutput;
+    QString simpleLastCardId;
+    QString simpleLastCardFamily;
+    QWidget* dumpTab = nullptr;
+    QComboBox* dumpModeBox = nullptr;
+    QComboBox* dumpMifareSizeBox = nullptr;
+    QPushButton* dumpDetectButton = nullptr;
+    QPushButton* dumpReadButton = nullptr;
+    QPushButton* dumpWriteButton = nullptr;
+    QPushButton* dumpVerifyButton = nullptr;
+    QPushButton* dumpCleanButton = nullptr;
+    QLabel* dumpStatusLabel = nullptr;
+    QLabel* dumpFamilyLabel = nullptr;
+    QLabel* dumpFrequencyLabel = nullptr;
+    QLabel* dumpIdLabel = nullptr;
+    QLabel* dumpCapabilityLabel = nullptr;
+    QTableWidget* dumpFieldTable = nullptr;
+    QTableWidget* dumpMapTable = nullptr;
+    QPlainTextEdit* dumpOutputEdit = nullptr;
+    QString dumpSourceOutput;
+    QString dumpReadOutput;
+    QString dumpWriteOutput;
+    QString dumpVerifyOutput;
+    QString dumpLastFamily;
+    QString dumpLastCardId;
+    QMap<int, QString> dumpSourceBlockMap;
+    QMap<int, QString> dumpTargetBlockMap;
 
     T55xxTab* t55xxTab;
     Mifare* mifare;
@@ -268,6 +320,61 @@ private:
     void MF_widgetReset();
     void setTableItem(QTableWidget *widget, int row, int column, const QString& text);
     void addClientPath(const QString& path);
+    QString findModernClientPath() const;
+    void quickActionsInit();
+    void simplePageInit();
+    void modernSettingsPageInit();
+    void simpleSyncPorts();
+    void simpleSetStatus(const QString& message, const QString& tone = "");
+    void simpleSetFirmwareStatus(const QString& message, const QString& tone = "");
+    void simpleCheckFirmwareHealth();
+    QString simpleFirmwareAdvice(const QString& output) const;
+    QString simpleExtractVersionToken(const QString& text, const QString& label) const;
+    void simpleSetBusy(bool busy);
+    void simpleClearScanDisplay();
+    void simpleRunScan();
+    void simpleRunClone();
+    QString simpleRunCommand(const QString& command, int waitTime);
+    void simpleApplyScanOutput(const QString& output);
+    QString simpleExtractCardId(const QString& output, const QString& family) const;
+    QString simpleDetectFamily(const QString& output) const;
+    QString simpleFrequencyForFamily(const QString& family) const;
+    QString simpleWritableForFamily(const QString& family) const;
+    QString simpleCloneCommand() const;
+    QStringList simpleCloneCommands() const;
+    QString simpleReadCommandForFamily(const QString& family) const;
+    QString simpleCloneTargetPrompt() const;
+    bool simpleIsHfUidCloneFamily(const QString& family) const;
+    QString simpleExtractHfParameter(const QString& output, const QString& parameter) const;
+    QString simpleBuildMifareBlock0(const QString& uid, const QString& atqa, const QString& sak) const;
+    void simpleHighlightPlacement(const QString& frequency);
+    void dumpPageInit(QTabWidget* advancedTabs);
+    void dumpSetStatus(const QString& message, const QString& tone = "");
+    void dumpSetBusy(bool busy);
+    void dumpClearDisplay();
+    void dumpRunDetect();
+    void dumpRunRead();
+    void dumpRunWrite();
+    void dumpRunVerify();
+    void dumpRunCleanFiles();
+    void dumpApplyDetectOutput(const QString& output);
+    void dumpRefreshFields();
+    QDir dumpGeneratedFilesDir() const;
+    QFileInfoList dumpGeneratedFiles(const QString& uid = QString()) const;
+    bool dumpMirrorMifareKeyFile();
+    QString dumpMifareCardArg() const;
+    QString dumpMifareKeyFilename() const;
+    QString dumpMifareDataFilename() const;
+    QString dumpMifareFileArgs() const;
+    QString dumpCapabilityForFamily(const QString& family) const;
+    bool dumpCanWriteFamily(const QString& family) const;
+    QString dumpMifareBlockData(int block) const;
+    QMap<int, QString> dumpExtractMifareBlockMap(const QString& output) const;
+    QMap<int, QString> dumpLoadMifareBlockMapFromLatestFile() const;
+    QStringList dumpExtractHexBlocks(const QString& output) const;
+    void dumpRefreshCardMap();
+    void makeTabScrollable(QWidget* tab);
+    void normalizeAdvancedPage(QWidget* tab);
     void loadClientPathList();
     void saveClientPathList();
     void dockInit();

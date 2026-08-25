@@ -180,7 +180,7 @@
             "show cmd": "data plot"
         },
         "search": {
-            "cmd": "lf search -u"
+            "cmd": "lf search"
         },
         "tune": {
             "cmd": "lf tune --divisor <divisor>"
