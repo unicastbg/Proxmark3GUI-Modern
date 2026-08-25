@@ -1,6 +1,37 @@
 # Change Log
 
-[中文](doc/CHANGELOG/CHANGELOG_zh_CN.md)  
+This project is a modernized Windows-focused fork of
+[wh201906/Proxmark3GUI](https://github.com/wh201906/Proxmark3GUI). Entries
+from `V0.2.8` and earlier are inherited from the original project history.
+
+## Unreleased
+
+- Documented direct Windows RRG/Iceman client download links from ProxmarkBuilds.
+- Documented the official RRG/Iceman project links for users who want to inspect
+  or build the Proxmark client themselves.
+
+## v0.3.0 - 2026-08-25
+
+- Added a modern Simple page for common scan, identify, clone, and verify flows.
+- Added a visual Proxmark3 placement guide with RF/NFC and LF pad states.
+- Added guided dump/restore workflow for supported MIFARE Classic cards.
+- Added card data map display for readable dump content.
+- Added support for the modern RRG/Iceman v4.21611 command configuration.
+- Improved COM port discovery, including later USB plug-in detection.
+- Improved connection state handling so Stop, Connect, and Disconnect behave
+  predictably.
+- Added firmware/client detection messaging for Iceman/RRG clients.
+- Added cleanup support for generated Proxmark dump/key files.
+- Reworked the top navigation into Simple, Advanced, and Settings sections.
+- Removed legacy opacity/language controls that no longer fit the modern UI.
+- Added a bundled dark theme and application icon.
+- Added screenshots and a Windows-focused README.
+- Added a Modern UI NSIS installer that defaults to Program Files.
+- Published the first GitHub release with a Windows installer asset.
+
+## Original Project History
+
+[Original Chinese changelog](doc/CHANGELOG/CHANGELOG_zh_CN.md)  
 
 ### V0.2.8
 + Add support for Iceman/RRG repo v4.16717  
