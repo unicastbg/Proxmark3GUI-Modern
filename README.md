@@ -55,8 +55,14 @@ block 0 or unreadable sectors instead of treating every clone as identical.
 - Qt 6.11.x and MinGW if building from source.
 - NSIS if building the installer.
 
-The app does not currently bundle a Proxmark client in the installer. Put a
-known-good RRG/Iceman client near the app or select it in Settings.
+The app does not currently bundle a Proxmark client in the installer. Download
+or build a known-good RRG/Iceman client from the official project:
+
+- RRG/Iceman repo: [github.com/RfidResearchGroup/proxmark3](https://github.com/RfidResearchGroup/proxmark3)
+- Releases: [github.com/RfidResearchGroup/proxmark3/releases](https://github.com/RfidResearchGroup/proxmark3/releases)
+
+Put `proxmark3.exe` near the app or select it in Settings. For best results, use
+a client build that matches the firmware flashed on your Proxmark3.
 
 ## Build From Source
 
