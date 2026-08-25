@@ -125,4 +125,6 @@ It is designed for use with the
 
 ## License
 
-LGPL-2.1, matching the bundled upstream license.
+LGPL-2.1, matching the inherited upstream license. The `LICENSE` file contains
+the unmodified LGPL-2.1 text, and `NOTICE.md` records project attribution for
+this modern fork.

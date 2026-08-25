@@ -9,6 +9,10 @@ from `V0.2.8` and earlier are inherited from the original project history.
 - Documented direct Windows RRG/Iceman client download links from ProxmarkBuilds.
 - Documented the official RRG/Iceman project links for users who want to inspect
   or build the Proxmark client themselves.
+- Removed the obsolete legacy `deploy/` release helper. Windows packaging is now
+  handled by `installer/nsis/Build-Installer.ps1`.
+- Added `NOTICE.md` for modern fork attribution while keeping the inherited
+  LGPL-2.1 license text unchanged.
 
 ## v0.3.0 - 2026-08-25
 
