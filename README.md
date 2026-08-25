@@ -59,7 +59,7 @@ The app does not currently bundle a Proxmark client in the installer. For a
 ready Windows client/firmware package, download the latest generic RRG/Iceman
 build from ProxmarkBuilds:
 
-- Direct Windows download: [proxmarkbuilds.org/latest/rrg_other](https://proxmarkbuilds.org/latest/rrg_other)
+- Direct Windows download: [proxmarkbuilds.org/latest/rrg_other.php](https://www.proxmarkbuilds.org/latest/rrg_other.php)
 - ProxmarkBuilds guide: [proxmarkbuilds.org](https://www.proxmarkbuilds.org/)
 
 You can also inspect or build the client from the official RRG/Iceman project:
