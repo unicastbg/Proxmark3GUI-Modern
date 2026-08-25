@@ -13,6 +13,8 @@ from `V0.2.8` and earlier are inherited from the original project history.
   handled by `installer/nsis/Build-Installer.ps1`.
 - Added `NOTICE.md` for modern fork attribution while keeping the inherited
   LGPL-2.1 license text unchanged.
+- Removed stale inherited official-client config, Chinese translation leftovers,
+  and outdated documentation/tutorial media that no longer matches the modern UI.
 
 ## v0.3.0 - 2026-08-25
 
@@ -34,8 +36,6 @@ from `V0.2.8` and earlier are inherited from the original project history.
 - Published the first GitHub release with a Windows installer asset.
 
 ## Original Project History
-
-[Original Chinese changelog](doc/CHANGELOG/CHANGELOG_zh_CN.md)  
 
 ### V0.2.8
 + Add support for Iceman/RRG repo v4.16717  
