@@ -2,7 +2,8 @@ param(
     [string]$QtBin = "C:\Qt\6.11.2\mingw_64\bin",
     [string]$MingwBin = "C:\Qt\Tools\mingw1310_64\bin",
     [string]$Nsis = "C:\Program Files (x86)\NSIS\Bin\makensis.exe",
-    [string]$Version = "0.3.0"
+    [string]$Version = "0.3.1",
+    [string]$ClientDir = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -16,6 +17,7 @@ $stageDir = Join-Path $stageRoot "Proxmark3GUI Modern"
 $projectFile = Join-Path $repoRoot "src\Proxmark3GUI.pro"
 $installerScript = Join-Path $PSScriptRoot "Proxmark3GUI-Modern.nsi"
 $outFile = Join-Path $distDir "Proxmark3GUI-Modern-$Version-setup.exe"
+$defaultClientDir = Join-Path $repoRoot "..\proxmark-tools\rrg_other-20260802\client"
 
 if(!(Test-Path -LiteralPath (Join-Path $QtBin "qmake.exe"))) {
     throw "qmake.exe was not found in $QtBin"
@@ -101,6 +103,61 @@ foreach($dir in $runtimeDirs) {
 
 Copy-Item -LiteralPath (Join-Path $repoRoot "README.md") -Destination $stageDir -Force
 Copy-Item -LiteralPath (Join-Path $repoRoot "LICENSE") -Destination $stageDir -Force
+Copy-Item -LiteralPath (Join-Path $repoRoot "NOTICE.md") -Destination $stageDir -Force
+Copy-Item -LiteralPath (Join-Path $repoRoot "THIRD_PARTY_NOTICES.md") -Destination $stageDir -Force
+
+if([string]::IsNullOrWhiteSpace($ClientDir) -and (Test-Path -LiteralPath $defaultClientDir)) {
+    $ClientDir = (Resolve-Path -LiteralPath $defaultClientDir).Path
+}
+
+if(-not [string]::IsNullOrWhiteSpace($ClientDir)) {
+    if(!(Test-Path -LiteralPath (Join-Path $ClientDir "proxmark3.exe"))) {
+        throw "ClientDir does not contain proxmark3.exe: $ClientDir"
+    }
+
+    $clientStageDir = Join-Path $stageDir "client"
+    New-Item -ItemType Directory -Force -Path $clientStageDir | Out-Null
+
+    $clientFiles = @(
+        "proxmark3.exe",
+        "bootrom.elf",
+        "fullimage.elf",
+        "pm3",
+        "pm3-flash",
+        "pm3-flash-all",
+        "pm3-flash-bootrom",
+        "pm3-flash-fullimage",
+        "setup.bat"
+    )
+
+    foreach($file in $clientFiles) {
+        $source = Join-Path $ClientDir $file
+        if(Test-Path -LiteralPath $source) {
+            Copy-Item -LiteralPath $source -Destination $clientStageDir -Force
+        }
+    }
+
+    $clientDirs = @(
+        "cmdscripts",
+        "dictionaries",
+        "libs",
+        "lualibs",
+        "luascripts",
+        "resources"
+    )
+
+    foreach($dir in $clientDirs) {
+        $source = Join-Path $ClientDir $dir
+        if(Test-Path -LiteralPath $source) {
+            Copy-Item -LiteralPath $source -Destination $clientStageDir -Recurse -Force
+        }
+    }
+
+    Write-Host "Bundled Proxmark client from: $ClientDir"
+}
+else {
+    Write-Warning "No Proxmark client directory found. Installer will be built without bundled proxmark3.exe."
+}
 
 & $Nsis "/DAPP_VERSION=$Version" "/DSTAGE_DIR=$stageDir" "/DOUT_FILE=$outFile" $installerScript
 

@@ -58,7 +58,7 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-VERSION = 0.3.0
+VERSION = 0.3.1
 QMAKE_TARGET_PRODUCT = "Proxmark3GUI Modern"
 QMAKE_TARGET_DESCRIPTION = "Modern Windows GUI for Proxmark3 RRG/Iceman client"
 QMAKE_TARGET_COMPANY = "Proxmark3GUI Modern contributors"

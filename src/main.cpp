@@ -34,14 +34,17 @@ int main(int argc, char *argv[])
 #endif
     settings.beginGroup("UI");
     QString theme = settings.value("Theme_Name", "modern_dark").toString();
+    if(theme == "(none)" || theme.isEmpty())
+    {
+        theme = "modern_dark";
+        settings.setValue("Theme_Name", theme);
+    }
     settings.endGroup();
 
     QFile* themeFile = new QFile();
     QTextStream* themeStream = new QTextStream();
     QString qssString = a.styleSheet(); // default behavior
-    if(theme == "(none)")
-        ;
-    else if(theme == "modern_dark")
+    if(theme == "modern_dark")
     {
         themeFile->setFileName(":/modern/modern_dark.qss");
         themeFile->open(QFile::ReadOnly | QFile::Text);

@@ -1,6 +1,7 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QClipboard>
@@ -409,35 +410,44 @@ void MainWindow::on_PM3_connectButton_clicked()
         port = portBox->currentText();
     qDebug() << "port:" << port;
     QString startArgs = ui->Set_Client_startArgsEdit->text();
-    QString clientPath = ui->PM3_pathBox->currentText();
-    QFileInfo clientFile(clientPath);
-    bool clientExist = false;
-
-    QStringList extList = {""};
-#ifdef Q_OS_WIN
-    if(clientFile.suffix().isEmpty())
+    QString clientPath = resolveClientExecutablePath(ui->PM3_pathBox->currentText());
+    if(clientPath.isEmpty())
     {
-        QString pathExt = QProcessEnvironment::systemEnvironment().value("pathext");
-        extList += pathExt.split(";", Qt::SkipEmptyParts);
-        if(extList.size() == 1)
-            extList += ".exe";
-    }
-#endif
-    for(const QString& ext : extList)
-    {
-        QFileInfo executable(clientFile.filePath() + ext);
-        if(executable.isFile())
+        for(int i = 0; i < ui->PM3_pathBox->count(); i++)
         {
-            clientExist = true;
-            break;
+            clientPath = resolveClientExecutablePath(ui->PM3_pathBox->itemText(i));
+            if(!clientPath.isEmpty())
+            {
+                ui->PM3_pathBox->setCurrentIndex(i);
+                break;
+            }
         }
     }
 
-    if(!clientExist)
+    if(clientPath.isEmpty())
     {
-        QMessageBox::information(this, tr("Info"), tr("The client path is invalid"), QMessageBox::Ok);
+        clientPath = resolveClientExecutablePath(findModernClientPath());
+        if(!clientPath.isEmpty())
+        {
+            int index = ui->PM3_pathBox->findText(clientPath);
+            if(index < 0)
+            {
+                ui->PM3_pathBox->insertItem(0, clientPath);
+                index = 0;
+            }
+            ui->PM3_pathBox->setCurrentIndex(index);
+        }
+    }
+
+    if(clientPath.isEmpty())
+    {
+        QMessageBox::information(this,
+                                 tr("Info"),
+                                 tr("The Proxmark client path is invalid.\n\nSelect a valid proxmark3.exe in Settings, or put the RRG/Iceman client next to the app."),
+                                 QMessageBox::Ok);
         return;
     }
+    QFileInfo clientFile(clientPath);
 
     // on RRG repo, if no port is specified, the client will search the available port
     if(port == "" && startArgs.contains("<port>")) // has <port>, no port
@@ -553,6 +563,8 @@ void MainWindow::onPM3StateChanged(bool st, const QString& info)
         setStatusBar(PM3VersionBar, info);
         setStatusBar(connectStatusBar, tr("Connected"));
         stopButton->setEnabled(true);
+        if(simpleConnectButton != nullptr)
+            simpleConnectButton->setEnabled(false);
         ui->PM3_disconnectButton->setEnabled(true);
         if(simpleDisconnectButton != nullptr)
             simpleDisconnectButton->setEnabled(true);
@@ -580,6 +592,8 @@ void MainWindow::onPM3StateChanged(bool st, const QString& info)
         setStatusBar(PM3VersionBar, "");
         setStatusBar(connectStatusBar, tr("Not Connected"));
         stopButton->setEnabled(false);
+        if(simpleConnectButton != nullptr)
+            simpleConnectButton->setEnabled(true);
         ui->PM3_disconnectButton->setEnabled(false);
         if(simpleDisconnectButton != nullptr)
             simpleDisconnectButton->setEnabled(false);
@@ -1437,7 +1451,6 @@ void MainWindow::uiInit()
     ui->funcTab->setCurrentWidget(simpleTab);
 
     ui->Set_UI_Theme_nameBox->addItem(tr("Modern Dark"), "modern_dark");
-    ui->Set_UI_Theme_nameBox->addItem(tr("(None)"), "(none)");
     ui->Set_UI_Theme_nameBox->addItem(tr("Dark"), "qdss_dark");
     ui->Set_UI_Theme_nameBox->addItem(tr("Light"), "qdss_light");
 
@@ -1783,6 +1796,34 @@ QString MainWindow::findModernClientPath() const
     return "";
 }
 
+QString MainWindow::resolveClientExecutablePath(const QString& path) const
+{
+    QString candidatePath = path.trimmed();
+    if(candidatePath.isEmpty())
+        return "";
+
+    QFileInfo clientFile(candidatePath);
+    QStringList extList = {""};
+#ifdef Q_OS_WIN
+    if(clientFile.suffix().isEmpty())
+    {
+        QString pathExt = QProcessEnvironment::systemEnvironment().value("pathext");
+        extList += pathExt.split(";", Qt::SkipEmptyParts);
+        if(extList.size() == 1)
+            extList += ".exe";
+    }
+#endif
+
+    for(const QString& ext : qAsConst(extList))
+    {
+        QFileInfo executable(clientFile.filePath() + ext);
+        if(executable.isFile())
+            return QDir::cleanPath(executable.absoluteFilePath());
+    }
+
+    return "";
+}
+
 void MainWindow::quickActionsInit()
 {
     QToolBar* quickBar = addToolBar(tr("Quick actions"));
@@ -1946,7 +1987,6 @@ void MainWindow::simplePageInit()
     modernSettingsPageInit();
 
     ui->label->hide();
-    ui->PM3_pathBox->hide();
     ui->label_18->hide();
     ui->PM3_portBox->hide();
     ui->PM3_refreshPortButton->hide();
@@ -2029,6 +2069,9 @@ void MainWindow::modernSettingsPageInit()
     QLabel* profileLabel = new QLabel(tr("RRG/Iceman modern"), clientBox);
     profileLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     clientLayout->addRow(tr("Profile:"), profileLabel);
+    ui->PM3_pathBox->setMinimumContentsLength(36);
+    ui->PM3_pathBox->show();
+    clientLayout->addRow(tr("Client path:"), ui->PM3_pathBox);
     clientLayout->addRow(tr("Command config:"), ui->Set_Client_configFileBox);
     QLabel* externalConfigLabel = new QLabel(tr("External config:"), clientBox);
     clientLayout->addRow(externalConfigLabel, ui->Set_Client_configPathEdit);
@@ -2118,10 +2161,10 @@ void MainWindow::modernSettingsPageInit()
     QHBoxLayout* themeLayout = new QHBoxLayout();
     themeLayout->addWidget(new QLabel(tr("Theme:"), appearanceBox));
     themeLayout->addWidget(ui->Set_UI_Theme_nameBox, 1);
-    ui->Set_UI_Theme_setButton->setText(tr("Save Theme"));
+    ui->Set_UI_Theme_setButton->setText(tr("Apply and Restart"));
     themeLayout->addWidget(ui->Set_UI_Theme_setButton);
     appearanceLayout->addLayout(themeLayout);
-    QLabel* themeHint = new QLabel(tr("Restart the app after saving a theme."), appearanceBox);
+    QLabel* themeHint = new QLabel(tr("Changing theme restarts the app so the whole interface reloads cleanly."), appearanceBox);
     themeHint->setWordWrap(true);
     appearanceLayout->addWidget(themeHint);
     pageLayout->addWidget(appearanceBox);
@@ -4177,6 +4220,15 @@ void MainWindow::loadClientPathList()
     ui->PM3_pathBox->clear();
     for(const QString& clientPath : qAsConst(m_clientPathList))
         ui->PM3_pathBox->addItem(clientPath);
+
+    for(int i = 0; i < ui->PM3_pathBox->count(); i++)
+    {
+        if(!resolveClientExecutablePath(ui->PM3_pathBox->itemText(i)).isEmpty())
+        {
+            ui->PM3_pathBox->setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 void MainWindow::saveClientPathList()
@@ -4432,9 +4484,29 @@ void MainWindow::on_Set_UI_Opacity_Box_valueChanged(int arg1)
 
 void MainWindow::on_Set_UI_Theme_setButton_clicked()
 {
+    QString theme = ui->Set_UI_Theme_nameBox->currentData().toString();
+    if(theme.isEmpty() || theme == "(none)")
+        theme = "modern_dark";
+
     settings->beginGroup("UI");
-    settings->setValue("Theme_Name", ui->Set_UI_Theme_nameBox->currentData().toString());
+    settings->setValue("Theme_Name", theme);
     settings->endGroup();
+    settings->sync();
+
+    QString executable = QApplication::applicationFilePath();
+    QStringList args = QApplication::arguments();
+    if(!args.isEmpty())
+        args.removeFirst();
+
+    if(!QProcess::startDetached(executable, args, QApplication::applicationDirPath()))
+    {
+        QMessageBox::warning(this,
+                             tr("Theme"),
+                             tr("The theme was saved, but the app could not restart automatically. Please close and reopen it."));
+        return;
+    }
+
+    QApplication::quit();
 }
 
 

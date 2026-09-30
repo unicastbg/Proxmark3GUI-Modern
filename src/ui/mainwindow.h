@@ -321,6 +321,7 @@ private:
     void setTableItem(QTableWidget *widget, int row, int column, const QString& text);
     void addClientPath(const QString& path);
     QString findModernClientPath() const;
+    QString resolveClientExecutablePath(const QString& path) const;
     void quickActionsInit();
     void simplePageInit();
     void modernSettingsPageInit();

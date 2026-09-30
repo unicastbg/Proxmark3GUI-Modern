@@ -51,13 +51,14 @@ block 0 or unreadable sectors instead of treating every clone as identical.
 
 - Windows 10/11.
 - A Proxmark3-compatible device.
-- A matching RRG/Iceman `proxmark3.exe` client.
+- A Proxmark3-compatible RRG/Iceman client. The Windows installer bundles one.
 - Qt 6.11.x and MinGW if building from source.
 - NSIS if building the installer.
 
-The app does not currently bundle a Proxmark client in the installer. For a
-ready Windows client/firmware package, download the latest generic RRG/Iceman
-build from ProxmarkBuilds:
+The Windows installer includes a cleaned RRG/Iceman client payload so the app can
+run without a separate client download. If you want to update or replace the
+bundled client, download the latest generic RRG/Iceman Windows build from
+ProxmarkBuilds:
 
 - Direct Windows download: [proxmarkbuilds.org/latest/rrg_other.php](https://www.proxmarkbuilds.org/latest/rrg_other.php)
 - ProxmarkBuilds guide: [proxmarkbuilds.org](https://www.proxmarkbuilds.org/)
@@ -67,8 +68,9 @@ You can also inspect or build the client from the official RRG/Iceman project:
 - RRG/Iceman repo: [github.com/RfidResearchGroup/proxmark3](https://github.com/RfidResearchGroup/proxmark3)
 - Releases: [github.com/RfidResearchGroup/proxmark3/releases](https://github.com/RfidResearchGroup/proxmark3/releases)
 
-Put `proxmark3.exe` near the app or select it in Settings. For best results, use
-a client build that matches the firmware flashed on your Proxmark3.
+The bundled client is installed under the app's `client` directory and should be
+found automatically. You can still select a different `proxmark3.exe` in Settings
+if you want a client build that exactly matches firmware you flashed yourself.
 
 ## Build From Source
 
@@ -100,7 +102,7 @@ Install NSIS, then run:
 The script builds the Qt release, stages only runtime files, and creates:
 
 ```text
-dist\Proxmark3GUI-Modern-0.3.0-setup.exe
+dist\Proxmark3GUI-Modern-0.3.1-setup.exe
 ```
 
 ## GitHub Release Checklist
@@ -111,7 +113,8 @@ Before publishing a release:
 - Run `windeployqt`.
 - Run the NSIS installer build.
 - Test install, launch, connect, scan, clone, dump, and verify.
-- Confirm README and release notes mention that users need an RRG/Iceman client.
+- Confirm README and release notes describe whether the installer bundles an
+  RRG/Iceman client.
 - Keep upstream attribution and the LGPL-2.1 license.
 - Replace screenshots with sanitized release captures if needed.
 

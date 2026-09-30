@@ -6,6 +6,8 @@ from `V0.2.8` and earlier are inherited from the original project history.
 
 ## Unreleased
 
+## v0.3.1 - 2026-09-30
+
 - Documented direct Windows RRG/Iceman client download links from ProxmarkBuilds.
 - Documented the official RRG/Iceman project links for users who want to inspect
   or build the Proxmark client themselves.
@@ -15,6 +17,16 @@ from `V0.2.8` and earlier are inherited from the original project history.
   LGPL-2.1 license text unchanged.
 - Removed stale inherited official-client config, Chinese translation leftovers,
   and outdated documentation/tutorial media that no longer matches the modern UI.
+- Disabled the Simple page Connect button while the Proxmark3 is already
+  connected.
+- Restored the Proxmark client path control in modern Settings and improved
+  invalid-path recovery when the saved client path is stale.
+- Updated the Windows installer build to bundle a cleaned RRG/Iceman client
+  payload when a local ProxmarkBuilds client is available.
+- Removed the unusable `(None)` theme option and automatically recover old
+  saved `(none)` theme settings back to Modern Dark.
+- Renamed the theme action to `Apply and Restart` so theme changes are saved and
+  reloaded immediately through an app restart.
 
 ## v0.3.0 - 2026-08-25
 
