@@ -2605,8 +2605,28 @@ QString MainWindow::simpleExtractCardId(const QString& output, const QString& fa
 
 QString MainWindow::simpleDetectFamily(const QString& output) const
 {
-    QString lower = output.toLower();
-    if(lower.contains("em 410x") || lower.contains("em410") || lower.contains("em tag"))
+    const QString rawLower = output.toLower();
+    QStringList evidenceLines;
+    const QStringList lines = rawLower.split(QRegularExpression("[\\r\\n]+"), Qt::SkipEmptyParts);
+    for(const QString& line : lines)
+    {
+        const QString trimmed = line.trimmed();
+        if(trimmed.isEmpty()
+           || trimmed.startsWith("---")
+           || trimmed.contains("pm3 -->")
+           || trimmed.contains("execute command from commandline")
+           || trimmed.contains("searching for")
+           || trimmed.contains("no known/supported")
+           || trimmed.contains("no tag found"))
+            continue;
+        evidenceLines << trimmed;
+    }
+
+    const QString lower = evidenceLines.join('\n');
+    const bool hasEm410xId = QRegularExpression(
+        "\\bem\\s*(?:410x|4100)?\\s*(?:tag\\s*)?id\\s*[:= ]+([0-9a-f]{10})",
+        QRegularExpression::CaseInsensitiveOption).match(lower).hasMatch();
+    if(hasEm410xId || lower.contains("valid em410x id found"))
         return "EM410x";
     if(lower.contains("hid prox") || lower.contains("hid h103") || lower.contains("hid format"))
         return "HID Prox";
@@ -2614,11 +2634,18 @@ QString MainWindow::simpleDetectFamily(const QString& output) const
         return "MIFARE Classic";
     if(lower.contains("ntag"))
         return "NTAG";
-    if(lower.contains("iso14443-a") || lower.contains("iso 14443-a") || (lower.contains("uid") && lower.contains("atqa") && lower.contains("sak")))
+    const bool hasIso14443aDetails = lower.contains("iso14443-a information")
+                                    || lower.contains("iso 14443-a information")
+                                    || lower.contains("valid iso14443-a tag found")
+                                    || lower.contains("valid iso 14443-a tag found")
+                                    || (lower.contains("uid") && lower.contains("atqa") && lower.contains("sak"));
+    if(hasIso14443aDetails)
         return "ISO14443-A / NFC";
-    if(lower.contains("t55") || lower.contains("t5577"))
+    if((lower.contains("chipset") && (lower.contains("t55") || lower.contains("t5577")))
+       || lower.contains("t55xx tag memory"))
         return "T55xx";
-    if(lower.contains("lf search") || lower.contains("low frequency"))
+    const bool ranLfSearch = rawLower.contains("--- lf search ---") || rawLower.contains("pm3 --> lf search");
+    if(ranLfSearch && lower.contains("valid") && lower.contains("found"))
         return "LF tag";
     return "Unknown";
 }

@@ -102,7 +102,7 @@ Install NSIS, then run:
 The script builds the Qt release, stages only runtime files, and creates:
 
 ```text
-dist\Proxmark3GUI-Modern-0.3.1-setup.exe
+dist\Proxmark3GUI-Modern-0.3.2-setup.exe
 ```
 
 ## GitHub Release Checklist

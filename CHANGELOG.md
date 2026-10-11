@@ -6,6 +6,13 @@ from `V0.2.8` and earlier are inherited from the original project history.
 
 ## Unreleased
 
+## v0.3.2 - 2026-10-11
+
+- Fixed false NFC and generic LF detections caused by treating Proxmark search
+  progress text as positive card evidence.
+- Restored the correct HF-to-LF fallback in Auto and Guided Dump scans when no
+  HF/NFC card is present.
+
 ## v0.3.1 - 2026-09-30
 
 - Documented direct Windows RRG/Iceman client download links from ProxmarkBuilds.
