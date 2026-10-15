@@ -6,6 +6,18 @@ from `V0.2.8` and earlier are inherited from the original project history.
 
 ## Unreleased
 
+## v0.3.3 - 2026-10-15
+
+- Simple Clone offers optional recovery for password-protected EM410x/T5577
+  targets after a failed write verification. Recovery checks common passwords,
+  resets the target with a confirmed password, and verifies the cloned ID.
+- Recovery requires confirmation that the target may be erased or damaged and
+  stops if the target changes, disconnects, or its reset cannot be verified.
+- Added regression tests for confirmed-password parsing and reset verification.
+- Validation: Windows build and parser tests pass. The underlying commands were
+  verified manually on a protected T55x7 card; the new GUI recovery flow has not
+  yet been tested end to end on a password-protected target.
+
 ## v0.3.2 - 2026-10-11
 
 - Fixed false NFC and generic LF detections caused by treating Proxmark search

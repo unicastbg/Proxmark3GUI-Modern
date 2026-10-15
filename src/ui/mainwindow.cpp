@@ -1,5 +1,6 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "common/t55xxrecovery.h"
 
 #include <QApplication>
 #include <QJsonDocument>
@@ -2532,10 +2533,77 @@ void MainWindow::simpleRunClone()
         if(verifyId == simpleLastCardId)
             break;
     }
+    if(pm3state && simpleLastCardFamily == "EM410x" && verifyId != simpleLastCardId)
+    {
+        const QString targetId = verifyId;
+        const int recover = QMessageBox::warning(this, tr("Recover LF Target"),
+            tr("The target did not accept the write. It may be password-protected.\n\n"
+               "Try common passwords and reset this target before cloning again? "
+               "Recovery erases the target and may permanently damage it. "
+               "Keep only the expendable target on the LF pad.\n\n"
+               "Unknown passwords and permanent locks may prevent recovery."),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if(recover == QMessageBox::Yes && pm3state)
+        {
+            auto runRecoveryCommand = [&](const QString& command, int waitTime) {
+                if(!pm3state)
+                    return QString();
+                QString result = simpleRunCommand(command, waitTime);
+                cloneOutput += "\n\n--- target recovery: " + command + " ---\n" + result;
+                simpleDetailsEdit->setPlainText((originalCheck + cloneOutput).trimmed());
+                return result;
+            };
+
+            simpleSetStatus(tr("Checking the target before recovery..."), "amber");
+            const QString currentTarget = simpleExtractCardId(runRecoveryCommand(readCommand, 5000), "EM410x");
+            if(targetId.length() != 10 || currentTarget != targetId)
+            {
+                cloneOutput += "\nRecovery stopped: the target ID could not be confirmed or changed.\n";
+            }
+            else if(pm3state)
+            {
+                simpleSetStatus(tr("Checking common target passwords. Keep the target on the LF pad..."), "amber");
+                QString passwordCommand = "lf t55xx chk --r0 --em " + targetId;
+                const QString clientPath = resolveClientExecutablePath(ui->PM3_pathBox->currentText());
+                const QString dictionary = QFileInfo(clientPath).absoluteDir().filePath("dictionaries/t55xx_default_pwds.dic");
+                if(QFileInfo::exists(dictionary))
+                    passwordCommand += " -f \"" + QDir::fromNativeSeparators(dictionary) + "\"";
+                const QString passwordOutput = runRecoveryCommand(passwordCommand, 15000);
+                const QString password = T55xxRecovery::confirmedPassword(passwordOutput);
+                if(!password.isEmpty() && pm3state)
+                {
+                    const QString finalTarget = simpleExtractCardId(runRecoveryCommand(readCommand, 5000), "EM410x");
+                    if(finalTarget == targetId && pm3state)
+                    {
+                        simpleSetStatus(tr("Password found. Resetting target..."), "amber");
+                        runRecoveryCommand("lf t55xx wipe -p " + password + " --r0", 10000);
+                        const QString config = runRecoveryCommand("lf t55xx detect", 10000);
+                        if(pm3state && T55xxRecovery::passwordCleared(config))
+                        {
+                            simpleSetStatus(tr("Target recovered. Writing and verifying the original ID..."), "");
+                            runRecoveryCommand("lf em 410x clone --id " + simpleLastCardId, 10000);
+                            verifyOutput = runRecoveryCommand(readCommand, 5000);
+                            verifyId = simpleExtractCardId(verifyOutput, "EM410x");
+                        }
+                        else
+                            cloneOutput += "\nRecovery stopped: reset could not be verified.\n";
+                    }
+                    else
+                        cloneOutput += "\nRecovery stopped: the target ID changed or could not be read.\n";
+                }
+                else
+                    cloneOutput += "\nRecovery stopped: no confirmed common password was found.\n";
+            }
+        }
+    }
     simpleDetailsEdit->setPlainText((originalCheck + cloneOutput).trimmed());
 
-    if(verifyId == simpleLastCardId)
+    if(!pm3state)
+        simpleSetStatus(tr("Clone interrupted. Reconnect and scan the source again."), "amber");
+    else if(verifyId == simpleLastCardId)
         simpleSetStatus(tr("Clone verified. The readable ID matches the original."), "green");
+    else if(simpleLastCardFamily == "EM410x")
+        simpleSetStatus(tr("LF clone was not verified. The target may be protected, locked, or incompatible. Press Show Details for the recovery result."), "red");
     else
         simpleSetStatus(tr("Clone failed verification. The readable ID does not match. The target may not support UID/block-0 writes; use a compatible magic card."), "red");
 

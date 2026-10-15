@@ -2,7 +2,7 @@ param(
     [string]$QtBin = "C:\Qt\6.11.2\mingw_64\bin",
     [string]$MingwBin = "C:\Qt\Tools\mingw1310_64\bin",
     [string]$Nsis = "C:\Program Files (x86)\NSIS\Bin\makensis.exe",
-    [string]$Version = "0.3.2",
+    [string]$Version = "0.3.3",
     [string]$ClientDir = ""
 )
 

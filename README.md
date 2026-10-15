@@ -38,6 +38,9 @@ Guided dump and restore workflow:
 
 - Identify common LF/HF cards through the Proxmark client.
 - Clone simple LF EM410x IDs to compatible T5577-style tags.
+- Offer optional common-password recovery for protected T5577 targets after a
+  failed Simple Clone write. Recovery erases the target and can damage it;
+  unknown passwords and permanent locks may prevent recovery.
 - Clone visible HF/MIFARE UIDs to compatible magic UID/CUID/USCUID-style cards.
 - Dump and restore MIFARE Classic cards when keys are known or discoverable.
 - Show a visual MIFARE Classic sector/block map after dump and verify.
@@ -102,7 +105,7 @@ Install NSIS, then run:
 The script builds the Qt release, stages only runtime files, and creates:
 
 ```text
-dist\Proxmark3GUI-Modern-0.3.2-setup.exe
+dist\Proxmark3GUI-Modern-0.3.3-setup.exe
 ```
 
 ## GitHub Release Checklist
