@@ -26,6 +26,8 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 #endif
     QApplication a(argc, argv);
+    a.setApplicationName("Proxmark3GUI Modern");
+    a.setApplicationVersion(QStringLiteral(APP_VERSION));
     a.setWindowIcon(QIcon(":/modern/app_icon.ico"));
 
     QSettings settings("GUIsettings.ini", QSettings::IniFormat);

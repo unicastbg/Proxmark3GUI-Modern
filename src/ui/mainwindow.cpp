@@ -185,8 +185,27 @@ MainWindow::MainWindow(QWidget *parent):
     ui->setupUi(this);
     dockAllWindows = new QAction(tr("Dock all windows"), this);
     myInfo = new QAction("Proxmark3GUI Modern", this);
-    currVersion = new QAction(tr("Ver: ") + QApplication::applicationVersion().section('.', 0, -2), this); // ignore the 4th version number
-    checkUpdate = new QAction(tr("Check Update"), this);
+    currVersion = new QAction(tr("Ver: ") + QApplication::applicationVersion(), this);
+    checkUpdate = new QAction(tr("Check for Updates"), this);
+    appUpdater = new AppUpdater(this);
+    connect(appUpdater, &AppUpdater::installRequested, this, [this]() {
+        if(operationRunning)
+        {
+            QMessageBox::information(this, tr("App Updates"), tr("Finish the current card operation before installing an update."));
+            return;
+        }
+        if(QMessageBox::question(this, tr("Install Update"),
+            tr("The installer has been downloaded and verified.\n\n"
+               "Close Proxmark3GUI Modern and start setup now? The reader will be disconnected. "
+               "Windows may request administrator approval."),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
+        {
+            if(pm3state)
+                on_PM3_disconnectButton_clicked();
+            settings->sync();
+            appUpdater->launchInstaller();
+        }
+    });
     connect(dockAllWindows, &QAction::triggered, [ = ]()
     {
         for(int i = 0; i < dockList.size(); i++)
@@ -196,10 +215,7 @@ MainWindow::MainWindow(QWidget *parent):
     {
         QDesktopServices::openUrl(QUrl("https://github.com/unicastbg/Proxmark3GUI-Modern"));
     });
-    connect(checkUpdate, &QAction::triggered, [ = ]()
-    {
-        QDesktopServices::openUrl(QUrl("https://github.com/unicastbg/Proxmark3GUI-Modern/releases"));
-    });
+    connect(checkUpdate, &QAction::triggered, this, &MainWindow::checkForAppUpdates);
 
     settings = new QSettings("GUIsettings.ini", QSettings::IniFormat);
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
@@ -1682,6 +1698,7 @@ bool MainWindow::eventFilter(QObject * watched, QEvent * event) // drag support
 
 void MainWindow::setState(bool st)
 {
+    operationRunning = !st && pm3state;
     if(!st && pm3state)
     {
         setStatusBar(programStatusBar, tr("Running"));
@@ -2194,7 +2211,7 @@ void MainWindow::modernSettingsPageInit()
 
     QGroupBox* aboutBox = new QGroupBox(tr("About"), content);
     QVBoxLayout* aboutLayout = new QVBoxLayout(aboutBox);
-    QLabel* appLabel = new QLabel(tr("Modern Windows build for Proxmark3 RRG/Iceman."), aboutBox);
+    QLabel* appLabel = new QLabel(tr("Proxmark3GUI Modern %1").arg(QApplication::applicationVersion()), aboutBox);
     appLabel->setWordWrap(true);
     QLabel* originalLabel = new QLabel(tr("Original project: <a href=\"https://github.com/wh201906/Proxmark3GUI\">wh201906/Proxmark3GUI</a>"), aboutBox);
     originalLabel->setOpenExternalLinks(true);
@@ -2204,6 +2221,9 @@ void MainWindow::modernSettingsPageInit()
     githubLabel->setOpenExternalLinks(true);
     githubLabel->setWordWrap(true);
     aboutLayout->addWidget(appLabel);
+    QPushButton* updateButton = new QPushButton(tr("Check for Updates"), aboutBox);
+    connect(updateButton, &QPushButton::clicked, this, &MainWindow::checkForAppUpdates);
+    aboutLayout->addWidget(updateButton, 0, Qt::AlignLeft);
     aboutLayout->addWidget(originalLabel);
     aboutLayout->addWidget(licenseLabel);
     aboutLayout->addWidget(githubLabel);
@@ -2212,6 +2232,16 @@ void MainWindow::modernSettingsPageInit()
     pageLayout->addStretch(1);
     scrollArea->setWidget(content);
     settingsLayout->addWidget(scrollArea);
+}
+
+void MainWindow::checkForAppUpdates()
+{
+    if(operationRunning)
+    {
+        QMessageBox::information(this, tr("App Updates"), tr("Finish the current card operation before checking for updates."));
+        return;
+    }
+    appUpdater->check();
 }
 
 void MainWindow::simpleSyncPorts()

@@ -8,6 +8,10 @@ from `V0.2.8` and earlier are inherited from the original project history.
 
 ## v0.3.3 - 2026-10-15
 
+- Added Settings > About > Check for Updates with GitHub release notes, installer
+  download, size/SHA-256 verification, and a prompt to close the app and run setup.
+- Update checks are manual and blocked during card operations. Updates affect
+  the Windows app and bundled client, not the connected board's firmware.
 - Simple Clone offers optional recovery for password-protected EM410x/T5577
   targets after a failed write verification. Recovery checks common passwords,
   resets the target with a confirmed password, and verifies the cloned ID.

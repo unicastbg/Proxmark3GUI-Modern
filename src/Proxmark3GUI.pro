@@ -1,4 +1,4 @@
-QT       += core gui serialport
+QT       += core gui serialport network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,6 +16,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    common/appupdater.cpp \
     common/myeventfilter.cpp \
     main.cpp \
     common/pm3process.cpp \
@@ -30,6 +31,8 @@ SOURCES += \
     ui/mf_attack_hardnesteddialog.cpp \
 
 HEADERS += \
+    common/appupdater.h \
+    common/appupdateinfo.h \
     common/t55xxrecovery.h \
     common/myeventfilter.h \
     common/pm3process.h \
@@ -60,6 +63,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 VERSION = 0.3.3
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 QMAKE_TARGET_PRODUCT = "Proxmark3GUI Modern"
 QMAKE_TARGET_DESCRIPTION = "Modern Windows GUI for Proxmark3 RRG/Iceman client"
 QMAKE_TARGET_COMPANY = "Proxmark3GUI Modern contributors"

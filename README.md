@@ -33,6 +33,8 @@ Guided dump and restore workflow:
 - Clear Proxmark3 LF/HF placement visual.
 - Settings cleanup for generated `hf-mf-*` dump/key files.
 - Installer support through NSIS.
+- Manual update checks in Settings > About, with release notes and verified
+  installer downloads. Installing an update closes the app and runs Windows setup.
 
 ## What It Can Do Today
 

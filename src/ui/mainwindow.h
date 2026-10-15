@@ -39,6 +39,7 @@
 #include "module/lf.h"
 #include "module/t55xxtab.h"
 #include "common/util.h"
+#include "common/appupdater.h"
 #include "ui/mf_trailerdecoderdialog.h"
 
 QT_BEGIN_NAMESPACE
@@ -69,6 +70,7 @@ public slots:
     void onPM3ErrorOccurred(QProcess::ProcessError error);
     void onPM3HWConnectFailed();
 private slots:
+    void checkForAppUpdates();
 
     void on_PM3_connectButton_clicked();
 
@@ -250,6 +252,8 @@ private:
 
     PM3Process* pm3;
     bool pm3state;
+    bool operationRunning = false;
+    AppUpdater* appUpdater = nullptr;
     bool keepButtonsEnabled;
     bool keepClientActive;
     QThread* pm3Thread;
